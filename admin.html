@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrador — Chacalluta</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tab-content { display: none; }
+    .tab-content.activo { display: block; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,104,71,0.1); border-left: 4px solid #006847; }
+    .stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; font-weight: 800; color: #006847; line-height: 1; }
+    .stat-label { font-size: 0.78rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .stat-card.dorado { border-left-color: #C9A84C; }
+    .stat-card.dorado .stat-num { color: #92400e; }
+    .stat-card.rojo { border-left-color: #dc2626; }
+    .stat-card.rojo .stat-num { color: #991b1b; }
+    .stat-card.morado { border-left-color: #7c3aed; }
+    .stat-card.morado .stat-num { color: #5b21b6; }
+
+    .calor-mes-titulo { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: #006847; font-size: 1rem; text-transform: uppercase; margin-bottom: 10px; }
+    .calor-dias-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 4px; }
+    .calor-dia-label { text-align: center; font-size: 0.65rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; }
+
+    .ventana-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #dde5de; }
+    .ventana-row:last-child { border-bottom: none; }
+    .ventana-grado { font-weight: 600; font-size: 0.9rem; }
+    .ventana-input { padding: 8px 10px; border: 2px solid #dde5de; border-radius: 6px; font-size: 0.85rem; }
+    .ventana-input:focus { outline: none; border-color: #006847; }
+
+    .bloqueo-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(220,38,38,0.06); border-radius: 8px; margin-bottom: 8px; }
+    .bloqueo-fecha { font-weight: 600; font-size: 0.9rem; color: #991b1b; }
+    .bloqueo-motivo { font-size: 0.8rem; color: #6b7280; }
+
+    .filtros { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+    .filtro-select { padding: 8px 12px; border: 2px solid #dde5de; border-radius: 8px; font-size: 0.85rem; }
+    .filtro-select:focus { outline: none; border-color: #006847; }
+
+    .acciones-fila { display: flex; gap: 6px; }
+    .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <img src="assets/escudo.png" alt="Escudo" class="header-logo">
+    <div class="header-texts">
+      <div class="header-titulo">Panel Administrador — Feriados 2024</div>
+      <div class="header-subtitulo">4ª Comisaría de Carabineros Chacalluta (F)</div>
+    </div>
+    <button class="btn btn-outline" onclick="cerrarSesion()" style="color:white; border-color:rgba(255,255,255,0.5); font-size:0.8rem; padding:8px 14px;">
+      🚪 Salir
+    </button>
+  </div>
+  <div class="header-banda"></div>
+</div>
+
+<!-- NAV TABS -->
+<div class="admin-nav">
+  <div class="admin-nav-inner">
+    <a href="#" class="admin-nav-link activo" onclick="showTab('dashboard',this)">📊 Dashboard</a>
+    <a href="#" class="admin-nav-link" onclick="showTab('solicitudes',this)">📋 Solicitudes</a>
+    <a href="#" class="admin-nav-link" onclick="showTab('ventanas',this)">🕐 Ventanas</a>
+    <a href="#" class="admin-nav-link" onclick="showTab('bloqueos',this)">🚫 Bloqueos</a>
+    <a href="#" class="admin-nav-link" onclick="showTab('exportar',this)">📤 Exportar</a>
+  </div>
+</div>
+
+<div class="contenedor">
+
+  <!-- ═══ TAB: DASHBOARD ═══ -->
+  <div id="tab-dashboard" class="tab-content activo">
+    <div class="stat-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Solicitudes totales</div></div>
+      <div class="stat-card dorado"><div class="stat-num" id="statPendientes">—</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-num" id="statAprobadas">—</div><div class="stat-label">Aprobadas</div></div>
+      <div class="stat-card rojo"><div class="stat-num" id="statRechazadas">—</div><div class="stat-label">Rechazadas</div></div>
+      <div class="stat-card morado"><div class="stat-num" id="statHoy">—</div><div class="stat-label">Con feriado hoy</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo">🌡️ Mapa de Calor — Demanda por Día</div>
+      <p style="font-size:0.85rem; color:#6b7280; margin-bottom:16px;">
+        Visualización de cuántos funcionarios tienen feriado cada día del período.
+      </p>
+      <div id="mapaCalor"></div>
+      <div class="leyenda" style="margin-top:12px;">
+        <div class="leyenda-item"><div class="leyenda-color calor-0" style="border:1px solid #ddd;"></div> 0 funcionarios</div>
+        <div class="leyenda-item"><div class="leyenda-color" style="background:rgba(0,104,71,0.3);"></div> 1-5</div>
+        <div class="leyenda-item"><div class="leyenda-color" style="background:rgba(217,119,6,0.5);"></div> 6-10</div>
+        <div class="leyenda-item"><div class="leyenda-color" style="background:rgba(220,38,38,0.5);"></div> 11-14</div>
+        <div class="leyenda-item"><div class="leyenda-color" style="background:#dc2626;"></div> 15 (lleno)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: SOLICITUDES ═══ -->
+  <div id="tab-solicitudes" class="tab-content">
+    <div class="card">
+      <div class="card-titulo">📋 Gestión de Solicitudes</div>
+
+      <div class="filtros">
+        <select class="filtro-select" id="filtroEstado" onchange="cargarSolicitudes()">
+          <option value="">Todos los estados</option>
+          <option value="pendiente" selected>⏳ Pendientes</option>
+          <option value="aprobado">✅ Aprobados</option>
+          <option value="rechazado">❌ Rechazados</option>
+          <option value="cancelado">🚫 Cancelados</option>
+        </select>
+        <input type="text" class="form-input" id="filtroNombre" placeholder="Buscar por nombre..." style="max-width:220px; padding:8px 12px;"
+               oninput="cargarSolicitudes()">
+        <button class="btn btn-outline btn-sm" onclick="cargarSolicitudes()">🔄 Actualizar</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="tabla-admin" id="tablaSolicitudes">
+          <thead>
+            <tr>
+              <th>Funcionario</th>
+              <th>Grado</th>
+              <th>Inicio</th>
+              <th>Fin hábiles</th>
+              <th>Fin extra</th>
+              <th>Días</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="bodySolicitudes">
+            <tr><td colspan="8" style="text-align:center; padding:20px;"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: VENTANAS ═══ -->
+  <div id="tab-ventanas" class="tab-content">
+    <div class="card">
+      <div class="card-titulo">🕐 Ventanas de Ingreso por Grado</div>
+      <div class="alerta alerta-info" style="margin-bottom:16px;">
+        💡 Configure la fecha y hora en que cada grado puede comenzar a ingresar solicitudes.
+        Si no se configura fecha, el grado puede ingresar en cualquier momento.
+      </div>
+      <div id="listaVentanas">
+        <div class="spinner"></div>
+      </div>
+      <button class="btn btn-primario" onclick="guardarVentanas()" style="margin-top:16px;">
+        💾 Guardar Cambios
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: BLOQUEOS ═══ -->
+  <div id="tab-bloqueos" class="tab-content">
+    <div class="card">
+      <div class="card-titulo">🚫 Fechas Bloqueadas</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:20px;">
+        <div class="form-grupo" style="margin:0;">
+          <label class="form-label">Fecha a bloquear</label>
+          <input type="date" id="nuevaFechaBloqueo" class="form-input" style="max-width:200px;">
+        </div>
+        <div class="form-grupo" style="margin:0; flex:1; min-width:200px;">
+          <label class="form-label">Motivo</label>
+          <input type="text" id="motivoBloqueo" class="form-input" placeholder="Ej: 18 de Septiembre, Operativo especial...">
+        </div>
+        <button class="btn btn-primario" onclick="agregarBloqueo()">+ Agregar</button>
+      </div>
+      <div id="listaBloqueos"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: EXPORTAR ═══ -->
+  <div id="tab-exportar" class="tab-content">
+    <div class="card">
+      <div class="card-titulo">📤 Exportar Datos</div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:16px;">
+        <div style="background:#f4f6f4; border-radius:12px; padding:20px; border:2px solid #dde5de;">
+          <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.1rem; color:#006847; margin-bottom:8px;">
+            📊 Solicitudes completas
+          </div>
+          <p style="font-size:0.85rem; color:#6b7280; margin-bottom:14px;">
+            Todas las solicitudes con nombre, grado, fechas y estado.
+          </p>
+          <button class="btn btn-primario" onclick="exportarCSV('solicitudes')">⬇️ Descargar CSV</button>
+        </div>
+
+        <div style="background:#f4f6f4; border-radius:12px; padding:20px; border:2px solid #dde5de;">
+          <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.1rem; color:#006847; margin-bottom:8px;">
+            ✅ Solo aprobados
+          </div>
+          <p style="font-size:0.85rem; color:#6b7280; margin-bottom:14px;">
+            Listado de feriados aprobados para el libro de novedades.
+          </p>
+          <button class="btn btn-primario" onclick="exportarCSV('aprobados')">⬇️ Descargar CSV</button>
+        </div>
+
+        <div style="background:#f4f6f4; border-radius:12px; padding:20px; border:2px solid #dde5de;">
+          <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.1rem; color:#006847; margin-bottom:8px;">
+            👥 Nómina de funcionarios
+          </div>
+          <p style="font-size:0.85rem; color:#6b7280; margin-bottom:14px;">
+            Listado completo de funcionarios registrados.
+          </p>
+          <button class="btn btn-primario" onclick="exportarCSV('funcionarios')">⬇️ Descargar CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo">⚙️ Configuración General</div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px;">
+        <div class="form-grupo">
+          <label class="form-label">Límite funcionarios por día</label>
+          <input type="number" id="confLimite" class="form-input" min="1" max="50" value="15">
+        </div>
+        <div class="form-grupo">
+          <label class="form-label">Máx. modificaciones por funcionario</label>
+          <input type="number" id="confModif" class="form-input" min="0" max="5" value="2">
+        </div>
+        <div class="form-grupo">
+          <label class="form-label">Inicio temporada</label>
+          <input type="date" id="confInicio" class="form-input">
+        </div>
+        <div class="form-grupo">
+          <label class="form-label">Fin temporada</label>
+          <input type="date" id="confFin" class="form-input">
+        </div>
+      </div>
+      <button class="btn btn-primario" onclick="guardarConfiguracion()">💾 Guardar Configuración</button>
+    </div>
+  </div>
+
+</div><!-- fin contenedor -->
+
+<!-- MODAL OBSERVACIÓN -->
+<div id="modalObservacion" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-titulo" id="modalTitulo">Rechazar solicitud</div>
+    <div class="form-grupo">
+      <label class="form-label">Observación (opcional)</label>
+      <textarea id="inputObservacion" class="form-input" rows="3" placeholder="Indique el motivo..."></textarea>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-peligro" id="btnConfModal" onclick="confirmarAccionModal()">Confirmar</button>
+      <button class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let adminData = null;
+let accionModal = null;
+let solicitudModal = null;
+
+// ── Init ──
+(async function() {
+  const data = sessionStorage.getItem('admin');
+  if (!data) { window.location.href = 'admin-login.html'; return; }
+  adminData = JSON.parse(data);
+  await cargarDashboard();
+  await cargarSolicitudes();
+  await cargarVentanas();
+  await cargarBloqueos();
+  await cargarConfiguracion();
+})();
+
+// ── TABS ──
+function showTab(nombre, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('activo'));
+  document.querySelectorAll('.admin-nav-link').forEach(a => a.classList.remove('activo'));
+  document.getElementById('tab-'+nombre).classList.add('activo');
+  el.classList.add('activo');
+}
+
+// ── DASHBOARD ──
+async function cargarDashboard() {
+  const { data: sols } = await db.from('solicitudes').select('estado, fecha_inicio, fecha_fin_habiles');
+  if (!sols) return;
+
+  const hoy = new Date().toISOString().split('T')[0];
+  const total = sols.length;
+  const pendientes = sols.filter(s=>s.estado==='pendiente').length;
+  const aprobadas  = sols.filter(s=>s.estado==='aprobado').length;
+  const rechazadas = sols.filter(s=>s.estado==='rechazado').length;
+  const conFeriado = sols.filter(s=>
+    ['pendiente','aprobado'].includes(s.estado) && s.fecha_inicio<=hoy && s.fecha_fin_habiles>=hoy
+  ).length;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPendientes').textContent = pendientes;
+  document.getElementById('statAprobadas').textContent  = aprobadas;
+  document.getElementById('statRechazadas').textContent = rechazadas;
+  document.getElementById('statHoy').textContent = conFeriado;
+
+  renderMapaCalor(sols.filter(s=>['pendiente','aprobado'].includes(s.estado)));
+}
+
+function renderMapaCalor(solicitudes) {
+  const cont = document.getElementById('mapaCalor');
+  // Contar por día
+  const conteo = {};
+  solicitudes.forEach(s => {
+    let d = new Date(s.fecha_inicio + 'T12:00:00');
+    const fin = new Date(s.fecha_fin_habiles + 'T12:00:00');
+    while (d <= fin) {
+      const k = d.toISOString().split('T')[0];
+      conteo[k] = (conteo[k]||0)+1;
+      d.setDate(d.getDate()+1);
+    }
+  });
+
+  // Mostrar 3 meses
+  const hoy = new Date(); hoy.setDate(1);
+  let html = '';
+  for (let m=0; m<3; m++) {
+    const mes = new Date(hoy.getFullYear(), hoy.getMonth()+m, 1);
+    const nombreMes = mes.toLocaleDateString('es-CL',{month:'long',year:'numeric'});
+    html += `<div class="calor-mes-titulo">${nombreMes.charAt(0).toUpperCase()+nombreMes.slice(1)}</div>`;
+    html += '<div class="calor-dias-labels"><div>D</div><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div></div>';
+    html += '<div class="calor-grid">';
+
+    const diasMes = new Date(mes.getFullYear(), mes.getMonth()+1, 0).getDate();
+    const inicio  = mes.getDay();
+    for (let i=0; i<inicio; i++) html += '<div></div>';
+
+    for (let d=1; d<=diasMes; d++) {
+      const fecha = new Date(mes.getFullYear(), mes.getMonth(), d);
+      const key   = fecha.toISOString().split('T')[0];
+      const cnt   = conteo[key]||0;
+      let clase = 'calor-0';
+      if (cnt>=15) clase='calor-100';
+      else if (cnt>=11) clase='calor-75';
+      else if (cnt>=6)  clase='calor-50';
+      else if (cnt>=1)  clase='calor-25';
+      const esFDS = fecha.getDay()===0||fecha.getDay()===6;
+      html += `<div class="calor-celda ${clase}" title="${key}: ${cnt} funcionarios" style="${esFDS?'opacity:0.6':''}">
+        <div>${d}</div><div style="font-size:0.55rem;">${cnt||''}</div>
+      </div>`;
+    }
+    html += '</div><br>';
+  }
+  cont.innerHTML = html;
+}
+
+// ── SOLICITUDES ──
+async function cargarSolicitudes() {
+  const tbody = document.getElementById('bodySolicitudes');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:16px;"><div class="spinner"></div></td></tr>';
+
+  const filtroEstado = document.getElementById('filtroEstado').value;
+  const filtroNombre = document.getElementById('filtroNombre').value.toLowerCase();
+
+  let query = db.from('solicitudes')
+    .select('*, funcionarios(nombre, grado, codigo)')
+    .order('created_at', {ascending:false});
+
+  if (filtroEstado) query = query.eq('estado', filtroEstado);
+
+  const { data } = await query;
+  if (!data) { tbody.innerHTML='<tr><td colspan="8" style="text-align:center;">Sin datos</td></tr>'; return; }
+
+  const filtrados = filtroNombre
+    ? data.filter(s => s.funcionarios?.nombre?.toLowerCase().includes(filtroNombre))
+    : data;
+
+  if (filtrados.length===0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#9ca3af;">No hay solicitudes con estos filtros.</td></tr>';
+    return;
+  }
+
+  const badges = { pendiente:'badge-pendiente', aprobado:'badge-aprobado', rechazado:'badge-rechazado', cancelado:'badge-cancelado' };
+  const textos = { pendiente:'⏳ Pendiente', aprobado:'✅ Aprobado', rechazado:'❌ Rechazado', cancelado:'🚫 Cancelado' };
+
+  tbody.innerHTML = filtrados.map(s => {
+    const f = s.funcionarios || {};
+    const acciones = s.estado==='pendiente' ? `
+      <div class="acciones-fila">
+        <button class="btn btn-primario btn-sm" onclick="accion('aprobar','${s.id}')">✅ Aprobar</button>
+        <button class="btn btn-peligro btn-sm"  onclick="accion('rechazar','${s.id}')">❌ Rechazar</button>
+      </div>` : '—';
+    return `<tr>
+      <td style="font-weight:600; font-size:0.85rem;">${f.nombre||'—'}<br><small style="color:#9ca3af;">${f.codigo||''}</small></td>
+      <td style="font-size:0.82rem;">${f.grado||'—'}</td>
+      <td style="font-size:0.82rem;">${fmtFecha(s.fecha_inicio)}</td>
+      <td style="font-size:0.82rem;">${fmtFecha(s.fecha_fin_habiles)}</td>
+      <td style="font-size:0.82rem;">${fmtFecha(s.fecha_fin_extraordinarios)}</td>
+      <td style="text-align:center; font-weight:700;">${s.dias_habiles}</td>
+      <td><span class="badge ${badges[s.estado]||''}">${textos[s.estado]||s.estado}</span></td>
+      <td>${acciones}</td>
+    </tr>`;
+  }).join('');
+}
+
+function accion(tipo, solicitudId) {
+  accionModal = tipo;
+  solicitudModal = solicitudId;
+  document.getElementById('modalTitulo').textContent = tipo==='aprobar' ? '✅ Aprobar solicitud' : '❌ Rechazar solicitud';
+  document.getElementById('btnConfModal').className = tipo==='aprobar' ? 'btn btn-primario' : 'btn btn-peligro';
+  document.getElementById('btnConfModal').textContent = tipo==='aprobar' ? 'Confirmar aprobación' : 'Confirmar rechazo';
+  document.getElementById('inputObservacion').value = '';
+  document.getElementById('modalObservacion').style.display = 'flex';
+}
+
+async function confirmarAccionModal() {
+  const obs = document.getElementById('inputObservacion').value.trim();
+  const nuevoEstado = accionModal==='aprobar' ? 'aprobado' : 'rechazado';
+  await db.from('solicitudes').update({ estado: nuevoEstado, observacion: obs, updated_at: new Date().toISOString() }).eq('id', solicitudModal);
+  cerrarModal();
+  await cargarSolicitudes();
+  await cargarDashboard();
+}
+
+function cerrarModal() { document.getElementById('modalObservacion').style.display = 'none'; }
+
+// ── VENTANAS ──
+async function cargarVentanas() {
+  const { data } = await db.from('ventanas_grado').select('*').order('orden_grado');
+  if (!data) return;
+  const cont = document.getElementById('listaVentanas');
+  cont.innerHTML = data.map(v => `
+    <div class="ventana-row">
+      <div class="ventana-grado">${v.grado}</div>
+      <input type="date" class="ventana-input" id="vf_${v.id}" value="${v.fecha_apertura||''}" placeholder="Sin fecha límite">
+      <input type="time" class="ventana-input" id="vh_${v.id}" value="${v.hora_apertura||'08:00'}">
+      <span style="font-size:0.75rem; color:#9ca3af;">Apertura</span>
+    </div>
+  `).join('');
+
+  // Guardar IDs para el save
+  window._ventanasData = data;
+}
+
+async function guardarVentanas() {
+  const data = window._ventanasData;
+  if (!data) return;
+  const updates = data.map(v => ({
+    id: v.id,
+    fecha_apertura: document.getElementById('vf_'+v.id).value || null,
+    hora_apertura:  document.getElementById('vh_'+v.id).value || '08:00:00'
+  }));
+  for (const u of updates) {
+    await db.from('ventanas_grado').update({ fecha_apertura: u.fecha_apertura, hora_apertura: u.hora_apertura }).eq('id', u.id);
+  }
+  alert('✅ Ventanas guardadas correctamente.');
+}
+
+// ── BLOQUEOS ──
+async function cargarBloqueos() {
+  const { data } = await db.from('fechas_bloqueadas').select('*').order('fecha');
+  const cont = document.getElementById('listaBloqueos');
+  if (!data || data.length===0) { cont.innerHTML='<p style="color:#9ca3af; font-size:0.85rem;">No hay fechas bloqueadas actualmente.</p>'; return; }
+  cont.innerHTML = data.map(b => `
+    <div class="bloqueo-row">
+      <div>
+        <div class="bloqueo-fecha">${fmtFecha(b.fecha)}</div>
+        <div class="bloqueo-motivo">${b.motivo||'Sin motivo especificado'}</div>
+      </div>
+      <button class="btn btn-peligro btn-sm" onclick="eliminarBloqueo('${b.id}')">🗑️ Quitar</button>
+    </div>
+  `).join('');
+}
+
+async function agregarBloqueo() {
+  const fecha  = document.getElementById('nuevaFechaBloqueo').value;
+  const motivo = document.getElementById('motivoBloqueo').value.trim();
+  if (!fecha) { alert('Seleccione una fecha.'); return; }
+  await db.from('fechas_bloqueadas').insert({ fecha, motivo: motivo||null });
+  document.getElementById('nuevaFechaBloqueo').value = '';
+  document.getElementById('motivoBloqueo').value = '';
+  await cargarBloqueos();
+}
+
+async function eliminarBloqueo(id) {
+  if (!confirm('¿Eliminar este bloqueo?')) return;
+  await db.from('fechas_bloqueadas').delete().eq('id', id);
+  await cargarBloqueos();
+}
+
+// ── CONFIGURACIÓN ──
+async function cargarConfiguracion() {
+  const { data } = await db.from('configuracion').select('*').eq('id',1).single();
+  if (!data) return;
+  document.getElementById('confLimite').value = data.limite_diario||15;
+  document.getElementById('confModif').value  = data.max_modificaciones||2;
+  if (data.temporada_inicio) document.getElementById('confInicio').value = data.temporada_inicio;
+  if (data.temporada_fin)    document.getElementById('confFin').value    = data.temporada_fin;
+}
+
+async function guardarConfiguracion() {
+  await db.from('configuracion').update({
+    limite_diario: parseInt(document.getElementById('confLimite').value)||15,
+    max_modificaciones: parseInt(document.getElementById('confModif').value)||2,
+    temporada_inicio: document.getElementById('confInicio').value||null,
+    temporada_fin:    document.getElementById('confFin').value||null,
+  }).eq('id',1);
+  alert('✅ Configuración guardada.');
+}
+
+// ── EXPORTAR CSV ──
+async function exportarCSV(tipo) {
+  let data, filename, headers, rows;
+
+  if (tipo==='solicitudes') {
+    const { data: d } = await db.from('solicitudes').select('*, funcionarios(nombre,grado,codigo,rut)').order('created_at',{ascending:false});
+    data = d;
+    filename = 'solicitudes_feriados.csv';
+    headers  = ['Código','Nombre','Grado','RUT','Fecha Inicio','Fin Hábiles','Fin Extraordinarios','Días Hábiles','Estado','Observación','Fecha Solicitud'];
+    rows = data.map(s => [
+      s.funcionarios?.codigo||'', s.funcionarios?.nombre||'', s.funcionarios?.grado||'', s.funcionarios?.rut||'',
+      s.fecha_inicio, s.fecha_fin_habiles, s.fecha_fin_extraordinarios, s.dias_habiles, s.estado, s.observacion||'',
+      s.created_at?.split('T')[0]||''
+    ]);
+  } else if (tipo==='aprobados') {
+    const { data: d } = await db.from('solicitudes').select('*, funcionarios(nombre,grado,codigo,rut)').eq('estado','aprobado').order('fecha_inicio');
+    data = d;
+    filename = 'feriados_aprobados.csv';
+    headers  = ['Código','Nombre','Grado','RUT','Inicio Feriado','Fin Días Hábiles','Fin con Extraordinarios','Total Días Hábiles'];
+    rows = data.map(s => [
+      s.funcionarios?.codigo||'', s.funcionarios?.nombre||'', s.funcionarios?.grado||'', s.funcionarios?.rut||'',
+      s.fecha_inicio, s.fecha_fin_habiles, s.fecha_fin_extraordinarios, s.dias_habiles
+    ]);
+  } else {
+    const { data: d } = await db.from('funcionarios').select('*').order('orden_grado').order('nombre');
+    data = d;
+    filename = 'nomina_funcionarios.csv';
+    headers  = ['Código','Nombre','Grado','RUT','Modificaciones Usadas'];
+    rows = data.map(f => [f.codigo, f.nombre, f.grado, f.rut, f.modificaciones_usadas||0]);
+  }
+
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── HELPERS ──
+function fmtFecha(str) {
+  if (!str) return '—';
+  const d = new Date(str + (str.includes('T')?'':'T12:00:00'));
+  return d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function cerrarSesion() {
+  sessionStorage.removeItem('admin');
+  window.location.href = 'admin-login.html';
+}
+</script>
+</body>
+</html>

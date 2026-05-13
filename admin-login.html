@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Administrador — Chacalluta</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: linear-gradient(160deg, #1a1a2e 0%, #004d35 60%, #006847 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-container { width: 100%; max-width: 400px; }
+    .login-header { text-align: center; margin-bottom: 28px; color: white; }
+    .login-logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
+    .login-titulo { font-family: 'Barlow Condensed', sans-serif; font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .login-subtitulo { font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+    .login-card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 24px 80px rgba(0,0,0,0.4); border-top: 4px solid #C9A84C; }
+    .btn-full { width: 100%; justify-content: center; margin-top: 8px; }
+    .error-msg { background: rgba(220,38,38,0.1); border-left: 3px solid #dc2626; color: #991b1b; padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 14px; display: none; }
+    .volver-link { display: block; text-align: center; margin-top: 16px; color: rgba(255,255,255,0.6); font-size: 0.8rem; text-decoration: none; }
+    .volver-link:hover { color: white; }
+  </style>
+</head>
+<body>
+<div class="login-container">
+  <div class="login-header">
+    <img src="assets/escudo.png" alt="Escudo" class="login-logo">
+    <div class="login-titulo">⚙️ Panel Administrador</div>
+    <div class="login-subtitulo">4ª Comisaría Chacalluta (F)</div>
+  </div>
+
+  <div class="login-card">
+    <div style="font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; color:#006847; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:20px; text-align:center;">
+      Acceso Restringido — Solo Personal Autorizado
+    </div>
+
+    <div class="error-msg" id="errorMsg">❌ Usuario o clave incorrectos.</div>
+
+    <div class="form-grupo">
+      <label class="form-label">Usuario</label>
+      <input type="text" id="inputUsuario" class="form-input" placeholder="admin" autocomplete="username">
+    </div>
+
+    <div class="form-grupo">
+      <label class="form-label">Contraseña</label>
+      <input type="password" id="inputClave" class="form-input" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn btn-primario btn-full" id="btnLogin" onclick="loginAdmin()">
+      Ingresar al Panel
+    </button>
+  </div>
+
+  <a href="index.html" class="volver-link">← Volver al acceso de funcionarios</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+if (sessionStorage.getItem('admin')) window.location.href = 'admin.html';
+
+document.getElementById('inputClave').addEventListener('keydown', e => { if(e.key==='Enter') loginAdmin(); });
+
+async function loginAdmin() {
+  const usuario = document.getElementById('inputUsuario').value.trim();
+  const clave   = document.getElementById('inputClave').value.trim();
+  const btn     = document.getElementById('btnLogin');
+  const errDiv  = document.getElementById('errorMsg');
+  errDiv.style.display = 'none';
+
+  if (!usuario || !clave) { errDiv.textContent='⚠️ Complete usuario y clave.'; errDiv.style.display='block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  const { data, error } = await db.from('admins').select('*').eq('usuario',usuario).eq('clave',clave).single();
+
+  if (error || !data) {
+    errDiv.textContent = '❌ Usuario o clave incorrectos.';
+    errDiv.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Ingresar al Panel';
+    return;
+  }
+
+  sessionStorage.setItem('admin', JSON.stringify(data));
+  window.location.href = 'admin.html';
+}
+</script>
+</body>
+</html>
