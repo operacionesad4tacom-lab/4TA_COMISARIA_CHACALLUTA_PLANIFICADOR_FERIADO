@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Mis Feriados — Chacalluta 2026</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ══════════════════════════════════════
+       MOBILE-FIRST DASHBOARD
+    ══════════════════════════════════════ */
+    * { -webkit-tap-highlight-color: transparent; }
+
+    body { background: #f0f4f0; }
+
+    /* ── Header compacto ── */
+    .header-inner { padding: 12px 16px; gap: 12px; }
+    .header-logo  { width: 48px; height: 48px; }
+    .header-titulo    { font-size: 1rem; }
+    .header-subtitulo { font-size: 0.7rem; }
+
+    /* ── Info funcionario pill ── */
+    .func-pill {
+      background: linear-gradient(135deg, #004d35, #006847);
+      border-radius: 16px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(0,104,71,0.2);
+    }
+    .func-avatar {
+      width: 48px; height: 48px; min-width: 48px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      border: 2px solid #C9A84C;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800; color: white;
+      font-family: 'Instrument Sans', sans-serif;
+    }
+    .func-info { flex: 1; min-width: 0; }
+    .func-nombre {
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 700; font-size: 0.9rem; color: white;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .func-grado  { font-size: 0.72rem; color: #e8c97a; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .func-codigo { font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 1px; }
+    .btn-salir {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+      color: white; border-radius: 8px; padding: 8px 12px;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer;
+      font-family: 'Instrument Sans', sans-serif; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-salir:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Contenedor ── */
+    .contenedor { padding: 16px; max-width: 680px; margin: 0 auto; }
+
+    /* ── Cards de selección principal ── */
+    .selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .selector-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 16px;
+      border: 2.5px solid #dde5de;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      -webkit-user-select: none; user-select: none;
+    }
+    .selector-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .selector-card.verde::before  { background: rgba(0,104,71,0.06); }
+    .selector-card.morado::before { background: rgba(124,58,237,0.06); }
+    .selector-card:active { transform: scale(0.97); }
+    .selector-card.activo.verde  { border-color: #006847; box-shadow: 0 4px 16px rgba(0,104,71,0.2); }
+    .selector-card.activo.morado { border-color: #7c3aed; box-shadow: 0 4px 16px rgba(124,58,237,0.2); }
+    .selector-card.activo::before { opacity: 1; }
+    .selector-icon { font-size: 2.2rem; margin-bottom: 8px; display: block; }
+    .selector-titulo {
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 700; font-size: 0.85rem;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      color: #1a1a1a; line-height: 1.3; margin-bottom: 6px;
+    }
+    .selector-desc { font-size: 0.75rem; color: #6b7280; line-height: 1.4; }
+    .selector-badge {
+      display: inline-block; margin-top: 8px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-verde  { background: rgba(0,104,71,0.12);  color: #004d35; }
+    .badge-morado { background: rgba(124,58,237,0.12); color: #5b21b6; }
+    .check-mark {
+      position: absolute; top: 10px; right: 10px;
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .verde  .check-mark { background: #006847; color: white; }
+    .morado .check-mark { background: #7c3aed; color: white; }
+    .selector-card.activo .check-mark { opacity: 1; }
+
+    /* ── Estado actual de solicitudes ── */
+    .estado-solicitudes {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .estado-card {
+      background: white; border-radius: 12px; padding: 14px;
+      border-left: 4px solid #dde5de;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .estado-card.tiene-feriado   { border-left-color: #006847; }
+    .estado-card.tiene-extras    { border-left-color: #7c3aed; }
+    .estado-tipo {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #9ca3af; margin-bottom: 4px;
+    }
+    .estado-info { font-size: 0.8rem; color: #374151; line-height: 1.5; font-weight: 500; }
+    .estado-vacio { font-size: 0.8rem; color: #9ca3af; font-style: italic; }
+    .estado-acciones { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .btn-mini {
+      padding: 5px 10px; font-size: 0.7rem; font-weight: 700;
+      border-radius: 6px; border: none; cursor: pointer;
+      font-family: 'Instrument Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      transition: all 0.15s;
+    }
+    .btn-mini-verde  { background: rgba(0,104,71,0.1);  color: #004d35; }
+    .btn-mini-verde:hover  { background: #006847; color: white; }
+    .btn-mini-rojo   { background: rgba(220,38,38,0.1); color: #991b1b; }
+    .btn-mini-rojo:hover   { background: #dc2626; color: white; }
+
+    /* ── Paso: pantalla completa ── */
+    .paso-screen {
+      display: none;
+      animation: slideIn 0.2s ease;
+    }
+    .paso-screen.visible { display: block; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Breadcrumb / Back bar ── */
+    .back-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-back {
+      background: white; border: 2px solid #dde5de;
+      border-radius: 10px; padding: 8px 14px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 600; color: #4a5568;
+      cursor: pointer; transition: all 0.15s; display: flex;
+      align-items: center; gap: 6px;
+    }
+    .btn-back:hover { border-color: #006847; color: #006847; }
+    .breadcrumb-txt {
+      font-size: 0.78rem; color: #9ca3af;
+      font-family: 'Instrument Sans', sans-serif;
+    }
+    .breadcrumb-txt strong { color: #374151; }
+
+    /* ── Card paso ── */
+    .paso-card {
+      background: white; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 14px;
+    }
+    .paso-card-titulo {
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 700; font-size: 1rem; color: #006847;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .paso-card-titulo.morado { color: #5b21b6; }
+
+    /* ── Info banner ── */
+    .info-banner {
+      background: rgba(0,104,71,0.07); border-radius: 10px;
+      padding: 12px 14px; margin-bottom: 16px;
+      font-size: 0.82rem; color: #374151; line-height: 1.6;
+      border-left: 3px solid #006847;
+    }
+    .info-banner.morado {
+      background: rgba(124,58,237,0.07); border-left-color: #7c3aed; color: #2d1b69;
+    }
+    .info-banner.aviso {
+      background: rgba(201,168,76,0.12); border-left-color: #C9A84C; color: #7c5e1a;
+    }
+
+    /* ── Selector días ── */
+    .dias-selector-wrap { margin: 16px 0; }
+    .dias-slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .dias-slider-row input[type=range] {
+      flex: 1; accent-color: #006847; height: 6px;
+      -webkit-appearance: none; border-radius: 3px;
+      background: linear-gradient(to right, #006847 var(--val,100%), #dde5de var(--val,100%));
+    }
+    .dias-numero {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 2.8rem; font-weight: 800; color: #006847;
+      min-width: 56px; text-align: center; line-height: 1;
+    }
+    .dias-cards { display: flex; gap: 10px; }
+    .dias-pill {
+      flex: 1; background: #f0f4f0; border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+    }
+    .dias-pill-num {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1.6rem; font-weight: 800; color: #006847; line-height: 1;
+    }
+    .dias-pill.morado .dias-pill-num { color: #7c3aed; }
+    .dias-pill-label { font-size: 0.65rem; color: #6b7280; text-transform: uppercase; margin-top: 3px; }
+
+    /* ── Calendario mobile ── */
+    .cal-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .cal-titulo {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1rem; font-weight: 700; color: #004d35;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .cal-nav-btn {
+      background: #006847; color: white; border: none;
+      border-radius: 8px; padding: 8px 16px; font-size: 1rem;
+      font-weight: 700; cursor: pointer; min-width: 44px; min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .cal-nav-btn.morado { background: #7c3aed; }
+    .cal-nav-btn:disabled { background: #dde5de; cursor: default; }
+
+    .cal-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .cal-table { width: 100%; border-collapse: collapse; min-width: 300px; }
+    .cal-table th {
+      padding: 8px 2px; text-align: center;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      color: white; background: #006847; letter-spacing: 0.3px;
+    }
+    .cal-table th.morado-h { background: #7c3aed; }
+    .cal-table td { padding: 2px; }
+
+    /* Día botón — tamaño táctil mínimo 44px */
+    .dia-btn-m {
+      width: 100%; min-height: 48px;
+      border: none; border-radius: 8px;
+      cursor: pointer; transition: all 0.12s;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1px; padding: 3px 1px;
+      position: relative;
+      -webkit-user-select: none; user-select: none;
+    }
+    .dia-num-m  { font-family: 'Instrument Sans', sans-serif; font-size: 1rem; font-weight: 700; line-height: 1; }
+    .dia-sub-m  { font-size: 0.55rem; font-weight: 600; line-height: 1; }
+    .dia-vacio-m { background: transparent !important; cursor: default !important; }
+
+    /* Colores estado */
+    .d-disponible { background: rgba(0,104,71,0.1); color: #004d35; }
+    .d-disponible:active { background: #006847; color: white; }
+    .d-casi      { background: rgba(217,119,6,0.18); color: #7c3d0a; }
+    .d-lleno     { background: rgba(220,38,38,0.1); color: #991b1b; cursor: not-allowed; }
+    .d-bloqueado { background: rgba(107,114,128,0.1); color: #9ca3af; cursor: not-allowed; }
+    .d-fds       { opacity: 0.65; }
+    .d-selec     { background: #C9A84C !important; color: #1a1a1a !important; font-weight: 800; }
+    .d-extras    { background: rgba(124,58,237,0.12); color: #5b21b6; }
+    .d-extras:active { background: #7c3aed; color: white; }
+    .d-selec-e   { background: #7c3aed !important; color: white !important; font-weight: 800; }
+
+    /* ── Leyenda ── */
+    .leyenda-m {
+      display: flex; flex-wrap: wrap; gap: 8px 14px;
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid #dde5de;
+    }
+    .leyenda-item-m {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; color: #6b7280;
+    }
+    .leyenda-dot {
+      width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+    }
+
+    /* ── Resumen confirmación ── */
+    .resumen-conf {
+      background: linear-gradient(135deg, #004d35, #006847);
+      border-radius: 14px; padding: 18px; color: white;
+      margin-bottom: 16px;
+    }
+    .resumen-conf.morado { background: linear-gradient(135deg, #3b0764, #7c3aed); }
+    .resumen-row {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 8px;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .resumen-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .resumen-label { font-size: 0.78rem; opacity: 0.75; flex-shrink: 0; }
+    .resumen-val   { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 0.88rem; text-align: right; color: #e8c97a; }
+
+    /* ── Botón principal ── */
+    .btn-accion {
+      width: 100%; padding: 16px; border: none; border-radius: 12px;
+      font-family: 'Instrument Sans', sans-serif; font-weight: 700;
+      font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;
+      cursor: pointer; transition: all 0.2s; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+      min-height: 52px;
+    }
+    .btn-accion-verde  { background: #006847; color: white; }
+    .btn-accion-verde:hover  { background: #004d35; }
+    .btn-accion-morado { background: #7c3aed; color: white; }
+    .btn-accion-morado:hover { background: #5b21b6; }
+    .btn-accion:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-accion-outline {
+      width: 100%; padding: 14px; border: 2px solid #dde5de;
+      border-radius: 12px; font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600; font-size: 0.88rem; color: #4a5568;
+      background: white; cursor: pointer; transition: all 0.2s;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      min-height: 48px;
+    }
+    .btn-accion-outline:hover { border-color: #006847; color: #006847; }
+
+    /* ── Éxito ── */
+    .exito-card {
+      background: white; border-radius: 20px; padding: 32px 20px;
+      text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .exito-icon { font-size: 4rem; margin-bottom: 12px; }
+    .exito-titulo {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1.5rem; font-weight: 800; color: #006847;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .exito-txt { font-size: 0.88rem; color: #4a5568; line-height: 1.6; margin-bottom: 20px; }
+
+    /* ── Responsive desktop ── */
+    @media (min-width: 600px) {
+      .contenedor { padding: 24px 20px; }
+      .header-titulo    { font-size: 1.4rem; }
+      .header-subtitulo { font-size: 0.78rem; }
+      .header-logo      { width: 60px; height: 60px; }
+      .dia-btn-m { min-height: 52px; }
+      .dia-num-m { font-size: 1.05rem; }
+      .dias-numero { font-size: 3rem; }
+    }
+
+    /* ── Pantalla home centrada ── */
+    .home-screen { animation: slideIn 0.2s ease; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <img src="assets/escudo.png" alt="Escudo" class="header-logo">
+    <div class="header-texts" style="flex:1; min-width:0;">
+      <div class="header-titulo">Feriados 2026</div>
+      <div class="header-subtitulo">4ª Comisaría Chacalluta (F)</div>
+    </div>
+  </div>
+  <div class="header-banda"></div>
+</div>
+
+<div class="contenedor">
+
+  <!-- ══════════════════════════════
+       PANTALLA HOME
+  ══════════════════════════════ -->
+  <div id="screenHome" class="home-screen">
+
+    <!-- Pill funcionario -->
+    <div class="func-pill">
+      <div class="func-avatar" id="avatarIniciales">--</div>
+      <div class="func-info">
+        <div class="func-nombre" id="infoNombre">Cargando...</div>
+        <div class="func-grado"  id="infoGrado"></div>
+        <div class="func-codigo" id="infoCodigo"></div>
+      </div>
+      <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+    </div>
+
+    <!-- Estado solicitudes actuales -->
+    <div class="estado-solicitudes" id="estadoSolicitudes">
+      <!-- se rellena dinámicamente -->
+    </div>
+
+    <!-- Selector qué planificar -->
+    <div class="paso-card" style="margin-bottom:14px;">
+      <div class="paso-card-titulo">¿Qué deseas planificar?</div>
+
+      <div class="selector-grid">
+        <!-- Feriado -->
+        <div class="selector-card verde" id="cardFeriado" onclick="seleccionarTipo('feriado')">
+          <div class="check-mark">✓</div>
+          <span class="selector-icon">🏖️</span>
+          <div class="selector-titulo">Feriado Anual</div>
+          <div class="selector-desc">Del 01 Jun al 30 Sep 2026</div>
+          <div class="selector-badge badge-verde">5 – 15 días hábiles</div>
+        </div>
+        <!-- Extraordinarios -->
+        <div class="selector-card morado" id="cardExtras" onclick="seleccionarTipo('extras')">
+          <div class="check-mark">✓</div>
+          <span class="selector-icon">🎖️</span>
+          <div class="selector-titulo">Días Extraordinarios</div>
+          <div class="selector-desc">Del 15 Jun al 26 Jul 2026</div>
+          <div class="selector-badge badge-morado">4 días corridos</div>
+        </div>
+      </div>
+
+      <button class="btn-accion btn-accion-verde" id="btnIrPlanificar" onclick="irAPlanificar()" disabled>
+        Planificar →
+      </button>
+    </div>
+
+  </div><!-- fin screenHome -->
+
+
+  <!-- ══════════════════════════════
+       PANTALLA FERIADO
+  ══════════════════════════════ -->
+  <div id="screenFeriado" class="paso-screen">
+
+    <!-- PASO F1: Cuántos días -->
+    <div id="pasoF1">
+      <div class="back-bar">
+        <button class="btn-back" onclick="volverHome()">← Volver</button>
+        <span class="breadcrumb-txt">Feriado · <strong>Paso 1 de 3</strong></span>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-card-titulo">🏖️ ¿Cuántos días hábiles?</div>
+        <div class="info-banner">
+          Período: <strong>01 Junio — 30 Septiembre 2026</strong>.<br>
+          Seleccione entre 5 y 15 días hábiles de feriado.
+        </div>
+
+        <div class="dias-selector-wrap">
+          <div class="dias-slider-row">
+            <span style="font-size:0.8rem;color:#6b7280;font-weight:600;">Días:</span>
+            <input type="range" id="rangeDias" min="5" max="15" value="15" step="1"
+                   oninput="actualizarDias(this.value)"
+                   style="--val:100%;">
+            <div class="dias-numero" id="valorDias">15</div>
+          </div>
+          <div class="dias-cards">
+            <div class="dias-pill">
+              <div class="dias-pill-num" id="numHabiles">15</div>
+              <div class="dias-pill-label">Días hábiles</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-accion btn-accion-verde" onclick="irF2()">
+          Elegir fecha de inicio →
+        </button>
+      </div>
+    </div>
+
+    <!-- PASO F2: Calendario -->
+    <div id="pasoF2" style="display:none;">
+      <div class="back-bar">
+        <button class="btn-back" onclick="irF1()">← Volver</button>
+        <span class="breadcrumb-txt">Feriado · <strong>Paso 2 de 3</strong></span>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-card-titulo">🗓️ Elige tu fecha de inicio</div>
+        <div class="info-banner">
+          Toca el día que quieres comenzar. Solo se muestran días dentro del período habilitado.
+          Máximo <strong>15 funcionarios</strong> con feriado simultáneo.
+        </div>
+
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="btnCalAnt" onclick="cambiarMes(-1)">‹</button>
+          <div class="cal-titulo" id="calTitulo">Junio 2026</div>
+          <button class="cal-nav-btn" id="btnCalSig" onclick="cambiarMes(1)">›</button>
+        </div>
+        <div class="cal-wrap">
+          <table class="cal-table" id="tablaFeriado">
+            <thead><tr>
+              <th>Do</th><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sá</th>
+            </tr></thead>
+            <tbody id="bodyFeriado"></tbody>
+          </table>
+        </div>
+
+        <div class="leyenda-m">
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:rgba(0,104,71,0.15);"></div>Disponible</div>
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:rgba(217,119,6,0.25);"></div>Pocos cupos</div>
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:rgba(220,38,38,0.15);"></div>Lleno</div>
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:rgba(107,114,128,0.12);"></div>No disponible</div>
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:#C9A84C;"></div>Seleccionado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO F3: Confirmar -->
+    <div id="pasoF3" style="display:none;">
+      <div class="back-bar">
+        <button class="btn-back" onclick="irF2()">← Cambiar fecha</button>
+        <span class="breadcrumb-txt">Feriado · <strong>Paso 3 de 3</strong></span>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-card-titulo">✅ Confirmar solicitud</div>
+
+        <div class="resumen-conf" id="resumenFeriado">
+          <div class="resumen-row"><span class="resumen-label">Funcionario</span><span class="resumen-val" id="cf_nombre">—</span></div>
+          <div class="resumen-row"><span class="resumen-label">Grado</span><span class="resumen-val" id="cf_grado">—</span></div>
+          <div class="resumen-row"><span class="resumen-label">Inicio</span><span class="resumen-val" id="cf_inicio">—</span></div>
+          <div class="resumen-row"><span class="resumen-label">Fin (<span id="cf_dias">—</span> días hábiles)</span><span class="resumen-val" id="cf_fin">—</span></div>
+        </div>
+
+        <div class="info-banner aviso" style="margin-bottom:14px;">
+          ⚠️ La solicitud quedará <strong>PENDIENTE</strong> hasta que el administrador la apruebe.
+          Puede modificarla hasta <strong>2 veces</strong> antes de ser aprobada.
+        </div>
+
+        <button class="btn-accion btn-accion-verde" id="btnConfFeriado" onclick="confirmarFeriado()">
+          📤 Enviar solicitud de feriado
+        </button>
+        <div style="height:10px;"></div>
+        <button class="btn-accion-outline" onclick="irF2()">Cambiar fecha</button>
+      </div>
+    </div>
+
+  </div><!-- fin screenFeriado -->
+
+
+  <!-- ══════════════════════════════
+       PANTALLA EXTRAS
+  ══════════════════════════════ -->
+  <div id="screenExtras" class="paso-screen">
+
+    <!-- PASO E1: Info + confirmación -->
+    <div id="pasoE1">
+      <div class="back-bar">
+        <button class="btn-back" onclick="volverHome()">← Volver</button>
+        <span class="breadcrumb-txt">Días Extraordinarios · <strong>Paso 1 de 2</strong></span>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-card-titulo morado">🎖️ Días Extraordinarios</div>
+
+        <div class="info-banner morado">
+          Autorizados por el Sr. <strong>General Director</strong>. Son <strong>4 días corridos</strong>
+          que debes tomar dentro del período habilitado.<br><br>
+          📅 <strong>Período:</strong> 15 de Junio — 26 de Julio 2026<br>
+          ⚠️ <strong>Son completamente independientes</strong> del feriado anual. No se pueden annexar ni tomar contiguos al feriado.
+        </div>
+
+        <div class="dias-cards" style="margin-bottom:20px;">
+          <div class="dias-pill morado" style="flex:none; padding:16px 24px;">
+            <div class="dias-pill-num">4</div>
+            <div class="dias-pill-label">Días corridos</div>
+          </div>
+          <div style="flex:1; background:#f0f4f0; border-radius:10px; padding:14px; font-size:0.8rem; color:#4a5568; line-height:1.6;">
+            Seleccionarás la <strong>fecha de inicio</strong> y el sistema calculará automáticamente los 4 días corridos.
+            El último inicio válido es el <strong>22 de Julio</strong> para que los 4 días quepan antes del 26 Jul.
+          </div>
+        </div>
+
+        <button class="btn-accion btn-accion-morado" onclick="irE2()">
+          Elegir fecha →
+        </button>
+      </div>
+    </div>
+
+    <!-- PASO E2: Calendario extras -->
+    <div id="pasoE2" style="display:none;">
+      <div class="back-bar">
+        <button class="btn-back" onclick="irE1()">← Volver</button>
+        <span class="breadcrumb-txt">Días Extraordinarios · <strong>Paso 2 de 2</strong></span>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-card-titulo morado">🗓️ Elige el inicio de tus 4 días</div>
+        <div class="info-banner morado">
+          Solo puedes elegir dentro del período <strong>15 Jun – 22 Jul 2026</strong>
+          (para que los 4 días terminen antes del 26 Jul).
+        </div>
+
+        <div class="cal-nav">
+          <button class="cal-nav-btn morado" id="btnCalAntE" onclick="cambiarMesE(-1)">‹</button>
+          <div class="cal-titulo" id="calTituloE" style="color:#5b21b6;">Junio 2026</div>
+          <button class="cal-nav-btn morado" id="btnCalSigE" onclick="cambiarMesE(1)">›</button>
+        </div>
+        <div class="cal-wrap">
+          <table class="cal-table" id="tablaExtras">
+            <thead><tr>
+              <th class="morado-h">Do</th><th class="morado-h">Lu</th><th class="morado-h">Ma</th>
+              <th class="morado-h">Mi</th><th class="morado-h">Ju</th><th class="morado-h">Vi</th><th class="morado-h">Sá</th>
+            </tr></thead>
+            <tbody id="bodyExtras"></tbody>
+          </table>
+        </div>
+
+        <div class="leyenda-m">
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:rgba(124,58,237,0.15);"></div>Disponible</div>
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:rgba(107,114,128,0.12);"></div>Fuera del período</div>
+          <div class="leyenda-item-m"><div class="leyenda-dot" style="background:#7c3aed;"></div>Seleccionado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO E3: Confirmar extras -->
+    <div id="pasoE3" style="display:none;">
+      <div class="back-bar">
+        <button class="btn-back" onclick="irE2()">← Cambiar fecha</button>
+        <span class="breadcrumb-txt">Días Extraordinarios · Confirmación</span>
+      </div>
+
+      <div class="paso-card">
+        <div class="paso-card-titulo morado">✅ Confirmar días extraordinarios</div>
+
+        <div class="resumen-conf morado" id="resumenExtras">
+          <div class="resumen-row"><span class="resumen-label">Funcionario</span><span class="resumen-val" id="ce_nombre">—</span></div>
+          <div class="resumen-row"><span class="resumen-label">Grado</span><span class="resumen-val" id="ce_grado">—</span></div>
+          <div class="resumen-row"><span class="resumen-label">Inicio</span><span class="resumen-val" id="ce_inicio">—</span></div>
+          <div class="resumen-row"><span class="resumen-label">Fin (4 días corridos)</span><span class="resumen-val" id="ce_fin">—</span></div>
+        </div>
+
+        <div class="info-banner morado" style="margin-bottom:14px;">
+          🎖️ Autorizados por el Sr. General Director. Independientes del feriado anual.
+        </div>
+
+        <button class="btn-accion btn-accion-morado" id="btnConfExtras" onclick="confirmarExtras()">
+          📤 Enviar días extraordinarios
+        </button>
+        <div style="height:10px;"></div>
+        <button class="btn-accion-outline" onclick="irE2()">Cambiar fecha</button>
+      </div>
+    </div>
+
+  </div><!-- fin screenExtras -->
+
+
+  <!-- ══════════════════════════════
+       PANTALLA ÉXITO
+  ══════════════════════════════ -->
+  <div id="screenExito" class="paso-screen">
+    <div class="exito-card">
+      <div class="exito-icon">✅</div>
+      <div class="exito-titulo">¡Solicitud enviada!</div>
+      <div class="exito-txt" id="exitoTxt"></div>
+      <div class="info-banner" style="text-align:left; margin-bottom:20px;">
+        📌 Tu solicitud quedará <strong>PENDIENTE</strong> hasta que el administrador la apruebe.
+      </div>
+      <button class="btn-accion btn-accion-verde" onclick="volverHome(); window.location.reload();">
+        Ver mis solicitudes
+      </button>
+    </div>
+  </div>
+
+</div><!-- fin contenedor -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Constantes ──
+const PERIODO_INI  = new Date('2026-06-01T12:00:00');
+const PERIODO_FIN  = new Date('2026-09-30T12:00:00');
+const EXTRAS_INI   = new Date('2026-06-15T12:00:00');
+const EXTRAS_FIN   = new Date('2026-07-22T12:00:00'); // último inicio válido
+
+// ── Estado ──
+let funcionario = null;
+let tipoSeleccionado = null;
+let diasF = 15;
+let fechaF = null;
+let fechaE = null;
+let cuposPorDia = {};
+let bloqueadas = new Set();
+let mesF = new Date(2026,5,1);
+let mesE = new Date(2026,5,1);
+let config = { limite_diario:15, max_modificaciones:2 };
+let solFeriado = null;
+let solExtras  = null;
+
+// ── Init ──
+(async () => {
+  const raw = sessionStorage.getItem('funcionario');
+  if (!raw) { location.href = 'index.html'; return; }
+  funcionario = JSON.parse(raw);
+
+  const ini = funcionario.nombre.split(' ').slice(0,2).map(n=>n[0]).join('');
+  document.getElementById('avatarIniciales').textContent = ini;
+  document.getElementById('infoNombre').textContent = funcionario.nombre;
+  document.getElementById('infoGrado').textContent  = funcionario.grado;
+  document.getElementById('infoCodigo').textContent = 'Cód. ' + funcionario.codigo;
+
+  await Promise.all([cargarConfig(), cargarBloqueadas(), cargarSolicitudes()]);
+  renderEstado();
+})();
+
+async function cargarConfig() {
+  const { data } = await db.from('configuracion').select('*').eq('id',1).single();
+  if (data) config = data;
+}
+async function cargarBloqueadas() {
+  const { data } = await db.from('fechas_bloqueadas').select('fecha');
+  if (data) data.forEach(f => bloqueadas.add(f.fecha));
+}
+async function cargarSolicitudes() {
+  const { data } = await db.from('solicitudes')
+    .select('*').eq('funcionario_id', funcionario.id)
+    .neq('estado','cancelado').order('created_at',{ascending:false});
+  if (!data) return;
+  solFeriado = data.find(s => !s.tipo || s.tipo==='feriado') || null;
+  solExtras  = data.find(s => s.tipo==='extraordinario') || null;
+}
+
+function renderEstado() {
+  const cont = document.getElementById('estadoSolicitudes');
+  if (!solFeriado && !solExtras) { cont.style.display='none'; return; }
+  cont.style.display = 'grid';
+
+  const badges = { pendiente:'⏳', aprobado:'✅', rechazado:'❌' };
+  const colores = { pendiente:'#d97706', aprobado:'#006847', rechazado:'#dc2626' };
+
+  let html = '';
+
+  // Card feriado
+  html += `<div class="estado-card ${solFeriado?'tiene-feriado':''}">
+    <div class="estado-tipo">🏖️ Feriado anual</div>`;
+  if (solFeriado) {
+    const c = colores[solFeriado.estado]||'#9ca3af';
+    html += `<div class="estado-info" style="color:${c}; font-size:0.75rem; font-weight:700; margin-bottom:4px;">
+      ${badges[solFeriado.estado]||''} ${(solFeriado.estado||'').toUpperCase()}</div>
+    <div class="estado-info">${fmtCorto(solFeriado.fecha_inicio)}<br>→ ${fmtCorto(solFeriado.fecha_fin_habiles)}<br>${solFeriado.dias_habiles} días hábiles</div>
+    <div class="estado-acciones">
+      ${solFeriado.estado!=='aprobado' && (funcionario.modificaciones_usadas||0)<(config.max_modificaciones||2)
+        ? `<button class="btn-mini btn-mini-verde" onclick="modificar('feriado','${solFeriado.id}')">✏️ Mod.</button>` : ''}
+      ${solFeriado.estado!=='aprobado'
+        ? `<button class="btn-mini btn-mini-rojo" onclick="cancelar('${solFeriado.id}')">🗑️</button>` : ''}
+    </div>`;
+  } else {
+    html += `<div class="estado-vacio">Sin solicitud</div>`;
+  }
+  html += '</div>';
+
+  // Card extras
+  html += `<div class="estado-card ${solExtras?'tiene-extras':''}">
+    <div class="estado-tipo">🎖️ Extraordinarios</div>`;
+  if (solExtras) {
+    const c = colores[solExtras.estado]||'#9ca3af';
+    html += `<div class="estado-info" style="color:${c}; font-size:0.75rem; font-weight:700; margin-bottom:4px;">
+      ${badges[solExtras.estado]||''} ${(solExtras.estado||'').toUpperCase()}</div>
+    <div class="estado-info">${fmtCorto(solExtras.fecha_inicio)}<br>→ ${fmtCorto(solExtras.fecha_fin_extraordinarios)}<br>4 días corridos</div>
+    <div class="estado-acciones">
+      ${solExtras.estado!=='aprobado' && (funcionario.modificaciones_usadas||0)<(config.max_modificaciones||2)
+        ? `<button class="btn-mini btn-mini-verde" onclick="modificar('extras','${solExtras.id}')">✏️ Mod.</button>` : ''}
+      ${solExtras.estado!=='aprobado'
+        ? `<button class="btn-mini btn-mini-rojo" onclick="cancelar('${solExtras.id}')">🗑️</button>` : ''}
+    </div>`;
+  } else {
+    html += `<div class="estado-vacio">Sin solicitud</div>`;
+  }
+  html += '</div>';
+
+  cont.innerHTML = html;
+}
+
+async function cancelar(id) {
+  if (!confirm('¿Cancelar esta solicitud?')) return;
+  await db.from('solicitudes').update({estado:'cancelado'}).eq('id',id);
+  location.reload();
+}
+async function modificar(tipo, id) {
+  if (!confirm('¿Modificar? Se usará una modificación disponible.')) return;
+  await db.from('solicitudes').update({estado:'cancelado'}).eq('id',id);
+  const m = (funcionario.modificaciones_usadas||0)+1;
+  await db.from('funcionarios').update({modificaciones_usadas:m}).eq('id',funcionario.id);
+  funcionario.modificaciones_usadas = m;
+  sessionStorage.setItem('funcionario', JSON.stringify(funcionario));
+  location.reload();
+}
+
+// ── Selección tipo ──
+function seleccionarTipo(tipo) {
+  tipoSeleccionado = tipo;
+  document.getElementById('cardFeriado').classList.toggle('activo', tipo==='feriado');
+  document.getElementById('cardExtras').classList.toggle('activo', tipo==='extras');
+  document.getElementById('btnIrPlanificar').disabled = false;
+  document.getElementById('btnIrPlanificar').textContent = tipo==='feriado'
+    ? '🏖️ Planificar feriado →' : '🎖️ Planificar días extraordinarios →';
+  document.getElementById('btnIrPlanificar').className = tipo==='feriado'
+    ? 'btn-accion btn-accion-verde' : 'btn-accion btn-accion-morado';
+}
+
+function irAPlanificar() {
+  if (!tipoSeleccionado) return;
+  // Validar si ya tiene aprobado
+  if (tipoSeleccionado==='feriado' && solFeriado?.estado==='aprobado') {
+    alert('Tu feriado ya está aprobado y no puede modificarse.'); return;
+  }
+  if (tipoSeleccionado==='extras' && solExtras?.estado==='aprobado') {
+    alert('Tus días extraordinarios ya están aprobados.'); return;
+  }
+  mostrarScreen(tipoSeleccionado==='feriado' ? 'screenFeriado' : 'screenExtras');
+  if (tipoSeleccionado==='feriado') { mostrarPasoF(1); }
+  else { mostrarPasoE(1); }
+}
+
+function volverHome() {
+  mostrarScreen('screenHome');
+  tipoSeleccionado = null;
+  document.getElementById('cardFeriado').classList.remove('activo');
+  document.getElementById('cardExtras').classList.remove('activo');
+  document.getElementById('btnIrPlanificar').disabled = true;
+  document.getElementById('btnIrPlanificar').textContent = 'Planificar →';
+  document.getElementById('btnIrPlanificar').className = 'btn-accion btn-accion-verde';
+}
+
+function mostrarScreen(id) {
+  ['screenHome','screenFeriado','screenExtras','screenExito'].forEach(s => {
+    document.getElementById(s).classList.toggle('visible', s===id);
+  });
+  window.scrollTo(0,0);
+}
+
+// ── Flujo Feriado ──
+function mostrarPasoF(n) {
+  ['pasoF1','pasoF2','pasoF3'].forEach((p,i) => {
+    document.getElementById(p).style.display = (i+1===n)?'block':'none';
+  });
+  window.scrollTo(0,0);
+}
+function irF1() { mostrarPasoF(1); }
+function irF2() { mostrarPasoF(2); renderCalFeriado(); }
+function irF3(fecha) { fechaF=fecha; mostrarPasoF(3); rellenarConfFeriado(); }
+
+function actualizarDias(val) {
+  diasF = parseInt(val);
+  document.getElementById('valorDias').textContent = val;
+  document.getElementById('numHabiles').textContent = val;
+  // Update slider gradient
+  const pct = ((val-5)/(15-5))*100;
+  document.getElementById('rangeDias').style.setProperty('--val', pct+'%');
+}
+
+async function renderCalFeriado() {
+  const body = document.getElementById('bodyFeriado');
+  body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;"><div class="spinner"></div></td></tr>';
+
+  const anio = mesF.getFullYear(), mes = mesF.getMonth();
+  document.getElementById('calTitulo').textContent = cap(mesF.toLocaleDateString('es-CL',{month:'long',year:'numeric'}));
+
+  const primD = new Date(anio,mes,1).getDay();
+  const diasM = new Date(anio,mes+1,0).getDate();
+  const hoy   = new Date(); hoy.setHours(0,0,0,0);
+  const lim   = config.limite_diario||15;
+
+  // Cargar cupos
+  await cargarCupos(anio, mes+1);
+
+  // Nav limits: Junio–Septiembre 2026
+  document.getElementById('btnCalAnt').disabled = (anio<=2026 && mes<=5);
+  document.getElementById('btnCalSig').disabled = (anio>=2026 && mes>=8);
+
+  let rows = '<tr>';
+  for (let i=0;i<primD;i++) rows += '<td><button class="dia-btn-m dia-vacio-m"></button></td>';
+
+  for (let d=1;d<=diasM;d++) {
+    const col = (primD+d-1)%7;
+    if (col===0 && d>1) rows += '</tr><tr>';
+    const fecha = new Date(anio,mes,d);
+    const key   = fecha.toISOString().split('T')[0];
+    const fds   = fecha.getDay()===0||fecha.getDay()===6;
+    const pasado= fecha<hoy;
+    const fuera = fecha<PERIODO_INI || fecha>PERIODO_FIN;
+    const bloq  = bloqueadas.has(key)||fuera||pasado;
+    const ocup  = cuposPorDia[key]||0;
+    const libres= Math.max(0,lim-ocup);
+
+    let cls = bloq?'d-bloqueado': libres===0?'d-lleno': ocup/lim>=0.67?'d-casi':'d-disponible';
+    if (fds && !bloq && libres>0) cls += ' d-fds';
+    if (fechaF===key) cls = 'd-selec';
+
+    const click = (!bloq && libres>0) ? `onclick="irF3('${key}')"` : '';
+    const sub   = bloq?(fuera?'':'–'): libres===0?'lleno':`${libres}`;
+
+    rows += `<td><button class="dia-btn-m ${cls}" ${click} ${bloq||libres===0?'disabled':''}>
+      <span class="dia-num-m">${d}</span>
+      <span class="dia-sub-m">${sub}</span>
+    </button></td>`;
+  }
+  const rest = (7-((primD+diasM)%7))%7;
+  for (let i=0;i<rest;i++) rows += '<td><button class="dia-btn-m dia-vacio-m"></button></td>';
+  rows += '</tr>';
+  body.innerHTML = rows;
+}
+
+function cambiarMes(delta) { mesF.setMonth(mesF.getMonth()+delta); renderCalFeriado(); }
+
+function rellenarConfFeriado() {
+  let h=0, d=new Date(fechaF+'T12:00:00');
+  while (h<diasF) { if(d.getDay()!==0&&d.getDay()!==6) h++; if(h<diasF) d.setDate(d.getDate()+1); }
+  document.getElementById('cf_nombre').textContent = funcionario.nombre;
+  document.getElementById('cf_grado').textContent  = funcionario.grado;
+  document.getElementById('cf_inicio').textContent = fmtLargo(fechaF);
+  document.getElementById('cf_dias').textContent   = diasF;
+  document.getElementById('cf_fin').textContent    = fmtLargo(d.toISOString().split('T')[0]);
+}
+
+async function confirmarFeriado() {
+  const btn = document.getElementById('btnConfFeriado');
+  btn.disabled=true; btn.textContent='Enviando...';
+  let h=0, d=new Date(fechaF+'T12:00:00');
+  while (h<diasF) { if(d.getDay()!==0&&d.getDay()!==6) h++; if(h<diasF) d.setDate(d.getDate()+1); }
+  const finStr = d.toISOString().split('T')[0];
+
+  const { error } = await db.from('solicitudes').insert({
+    funcionario_id: funcionario.id,
+    fecha_inicio: fechaF,
+    fecha_fin_habiles: finStr,
+    fecha_fin_extraordinarios: finStr,
+    dias_habiles: diasF,
+    estado: 'pendiente',
+    tipo: 'feriado'
+  });
+
+  if (error) { alert('Error: '+error.message); btn.disabled=false; btn.textContent='📤 Enviar solicitud de feriado'; return; }
+
+  document.getElementById('exitoTxt').innerHTML =
+    `<strong>${funcionario.nombre}</strong>, tu solicitud de feriado fue registrada.<br>
+    Del <strong>${fmtLargo(fechaF)}</strong> al <strong>${fmtLargo(finStr)}</strong> (${diasF} días hábiles).`;
+  mostrarScreen('screenExito');
+}
+
+// ── Flujo Extras ──
+function mostrarPasoE(n) {
+  ['pasoE1','pasoE2','pasoE3'].forEach((p,i) => {
+    document.getElementById(p).style.display = (i+1===n)?'block':'none';
+  });
+  window.scrollTo(0,0);
+}
+function irE1() { mostrarPasoE(1); }
+function irE2() { mostrarPasoE(2); renderCalExtras(); }
+function irE3(fecha) { fechaE=fecha; mostrarPasoE(3); rellenarConfExtras(); }
+
+async function renderCalExtras() {
+  const body = document.getElementById('bodyExtras');
+  body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;"><div class="spinner"></div></td></tr>';
+
+  const anio = mesE.getFullYear(), mes = mesE.getMonth();
+  document.getElementById('calTituloE').textContent = cap(mesE.toLocaleDateString('es-CL',{month:'long',year:'numeric'}));
+
+  const primD = new Date(anio,mes,1).getDay();
+  const diasM = new Date(anio,mes+1,0).getDate();
+  const hoy   = new Date(); hoy.setHours(0,0,0,0);
+
+  document.getElementById('btnCalAntE').disabled = (anio<=2026 && mes<=5);
+  document.getElementById('btnCalSigE').disabled = (anio>=2026 && mes>=6);
+
+  let rows = '<tr>';
+  for (let i=0;i<primD;i++) rows += '<td><button class="dia-btn-m dia-vacio-m"></button></td>';
+
+  for (let d=1;d<=diasM;d++) {
+    const col = (primD+d-1)%7;
+    if (col===0 && d>1) rows += '</tr><tr>';
+    const fecha = new Date(anio,mes,d);
+    const key   = fecha.toISOString().split('T')[0];
+    const pasado= fecha<hoy;
+    const valido= fecha>=EXTRAS_INI && fecha<=EXTRAS_FIN && !pasado && !bloqueadas.has(key);
+
+    let cls = valido ? 'd-extras' : 'd-bloqueado';
+    if (fechaE===key) cls = 'd-selec-e';
+
+    const click = valido ? `onclick="irE3('${key}')"` : '';
+
+    rows += `<td><button class="dia-btn-m ${cls}" ${click} ${!valido?'disabled':''}>
+      <span class="dia-num-m">${d}</span>
+    </button></td>`;
+  }
+  const rest = (7-((primD+diasM)%7))%7;
+  for (let i=0;i<rest;i++) rows += '<td><button class="dia-btn-m dia-vacio-m"></button></td>';
+  rows += '</tr>';
+  body.innerHTML = rows;
+}
+
+function cambiarMesE(delta) { mesE.setMonth(mesE.getMonth()+delta); renderCalExtras(); }
+
+function rellenarConfExtras() {
+  const fin = new Date(fechaE+'T12:00:00'); fin.setDate(fin.getDate()+3);
+  document.getElementById('ce_nombre').textContent = funcionario.nombre;
+  document.getElementById('ce_grado').textContent  = funcionario.grado;
+  document.getElementById('ce_inicio').textContent = fmtLargo(fechaE);
+  document.getElementById('ce_fin').textContent    = fmtLargo(fin.toISOString().split('T')[0]);
+}
+
+async function confirmarExtras() {
+  const btn = document.getElementById('btnConfExtras');
+  btn.disabled=true; btn.textContent='Enviando...';
+  const fin = new Date(fechaE+'T12:00:00'); fin.setDate(fin.getDate()+3);
+  const finStr = fin.toISOString().split('T')[0];
+
+  const { error } = await db.from('solicitudes').insert({
+    funcionario_id: funcionario.id,
+    fecha_inicio: fechaE,
+    fecha_fin_habiles: finStr,
+    fecha_fin_extraordinarios: finStr,
+    dias_habiles: 4,
+    estado: 'pendiente',
+    tipo: 'extraordinario'
+  });
+
+  if (error) { alert('Error: '+error.message); btn.disabled=false; btn.textContent='📤 Enviar días extraordinarios'; return; }
+
+  document.getElementById('exitoTxt').innerHTML =
+    `<strong>${funcionario.nombre}</strong>, tus días extraordinarios fueron registrados.<br>
+    Del <strong>${fmtLargo(fechaE)}</strong> al <strong>${fmtLargo(finStr)}</strong>.`;
+  mostrarScreen('screenExito');
+}
+
+// ── Cupos ──
+async function cargarCupos(anio, mes) {
+  const ini = `${anio}-${String(mes).padStart(2,'0')}-01`;
+  const fin  = `${anio}-${String(mes).padStart(2,'0')}-31`;
+  const { data } = await db.from('solicitudes')
+    .select('fecha_inicio,fecha_fin_habiles')
+    .in('estado',['pendiente','aprobado'])
+    .in('tipo',['feriado',null])
+    .lte('fecha_inicio',fin).gte('fecha_fin_habiles',ini);
+  cuposPorDia = {};
+  if (!data) return;
+  data.forEach(s => {
+    let d=new Date(s.fecha_inicio+'T12:00:00');
+    const f=new Date(s.fecha_fin_habiles+'T12:00:00');
+    while(d<=f){const k=d.toISOString().split('T')[0]; cuposPorDia[k]=(cuposPorDia[k]||0)+1; d.setDate(d.getDate()+1);}
+  });
+}
+
+// ── Helpers ──
+function fmtLargo(str) {
+  if (!str) return '—';
+  return new Date(str+'T12:00:00').toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+function fmtCorto(str) {
+  if (!str) return '—';
+  return new Date(str+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'short',year:'numeric'});
+}
+function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+function cerrarSesion() { sessionStorage.removeItem('funcionario'); location.href='index.html'; }
+</script>
+</body>
+</html>
